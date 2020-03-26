@@ -22,14 +22,14 @@ struct Opt {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut rl = Editor::<()>::new();
-	let mut rt = Runtime::new().unwrap();
+	let mut rt = Runtime::new()?;
     let history_path = ProjectDirs::from("net", "ironhaven", "rcon-shell")
         .unwrap()
         .cache_dir()
         .join("history.txt");
     if let Err(_) = rl.load_history(&history_path) {
-        fs::create_dir_all(&history_path.parent().unwrap()).unwrap();
-        fs::write(&history_path, "").unwrap();
+        fs::create_dir_all(&history_path.parent().unwrap())?;
+        fs::File::create(&history_path)?;
     }
 	let opt = Opt::from_args();
     println!("{:#?}", opt);
