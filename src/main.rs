@@ -4,6 +4,7 @@ use rustyline::Editor;
 use std::error::Error;
 use std::fs;
 use structopt::StructOpt;
+use tokio::runtime::Runtime;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "rcon-shell")]
@@ -21,7 +22,7 @@ struct Opt {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut rl = Editor::<()>::new();
-    let opt = Opt::from_args();
+	let mut rt = Runtime::new().unwrap();
     let history_path = ProjectDirs::from("net", "ironhaven", "rcon-shell")
         .unwrap()
         .cache_dir()
@@ -32,19 +33,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 	let opt = Opt::from_args();
     println!("{:#?}", opt);
-    let mut rcon = facio::client::RconClient::open(
-        dbg!(format!("{}:{}", opt.host, opt.port)),
-        opt.password,
-        <Option<String>>::None, // A rare (required) left swiming turbofish
-        Some(std::time::Duration::from_secs(3)),
-    )?;
+    let mut rcon = rt.block_on(rcon::Connection::connect(
+        (opt.host.as_str(), opt.port),
+        &opt.password,
+    ))?;
     loop {
         let readline = rl.readline("> ");
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 println!("{}", line);
-				println!("{}", rcon.exec(line)?);
+				println!("{}", rt.block_on(rcon.cmd(&line))?);
             }
             Err(ReadlineError::Interrupted) => {
                 break;

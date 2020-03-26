@@ -1,0 +1,3 @@
+[submodule "rust-rcon"]
+	path = rust-rcon
+	url = https://github.com/ironhaven/rust-rcon
