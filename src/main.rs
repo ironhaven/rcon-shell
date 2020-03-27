@@ -33,18 +33,20 @@ fn main() -> Result<(), Box<dyn Error>> {
         fs::File::create(&history_path)?;
     }
     let opt = Opt::from_args();
-    println!("{:#?}", opt);
     let mut rcon = rt.block_on(rcon::Connection::connect(
         (opt.host.as_str(), opt.port),
         &opt.password
             .unwrap_or_else(|| rpassword::read_password_from_tty(Some("rcon password: ")).unwrap()),
     ))?;
+	println!("Enter 'Q' to quit");
     loop {
         let readline = rl.readline("> ");
         match readline {
+			Ok(quit) if quit == "Q" => {
+				break;
+			}
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                println!("{}", line);
                 println!("{}", rt.block_on(rcon.cmd(&line))?);
             }
             Err(ReadlineError::Interrupted) => {
