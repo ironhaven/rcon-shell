@@ -47,7 +47,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 			}
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                println!("{}", rt.block_on(rcon.cmd(&line))?);
+				let resp = rt.block_on(rcon.cmd(&line))?;
+				if !resp.is_empty() {
+						println!("{}", resp);
+	}
             }
             Err(ReadlineError::Interrupted) => {
                 break;
