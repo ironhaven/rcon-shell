@@ -15,14 +15,15 @@ struct Opt {
     /// Port number of server connect to
     #[structopt(short = "P", long, default_value = "25575")]
     port: u16,
-    /// RCON password to server. Empty by default
-    #[structopt(short, long, default_value = "")]
-    password: String,
+    /// RCON password to server. Can be given in prompt
+    /// The password input will be hidden in the prompt
+    #[structopt(short, long)]
+    password: Option<String>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut rl = Editor::<()>::new();
-	let mut rt = Runtime::new()?;
+    let mut rt = Runtime::new()?;
     let history_path = ProjectDirs::from("net", "ironhaven", "rcon-shell")
         .unwrap()
         .cache_dir()
@@ -31,11 +32,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         fs::create_dir_all(&history_path.parent().unwrap())?;
         fs::File::create(&history_path)?;
     }
-	let opt = Opt::from_args();
+    let opt = Opt::from_args();
     println!("{:#?}", opt);
     let mut rcon = rt.block_on(rcon::Connection::connect(
         (opt.host.as_str(), opt.port),
-        &opt.password,
+        &opt.password
+            .unwrap_or_else(|| rpassword::read_password_from_tty(Some("rcon password: ")).unwrap()),
     ))?;
     loop {
         let readline = rl.readline("> ");
@@ -43,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
                 println!("{}", line);
-				println!("{}", rt.block_on(rcon.cmd(&line))?);
+                println!("{}", rt.block_on(rcon.cmd(&line))?);
             }
             Err(ReadlineError::Interrupted) => {
                 break;

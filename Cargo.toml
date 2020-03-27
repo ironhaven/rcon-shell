@@ -10,5 +10,6 @@ edition = "2018"
 rcon = { path = "./rust-rcon" }
 tokio = { version = "0.2", features = ["rt-core"] }
 rustyline = "6.0.0"
+rpassword = "4.0.2"
 structopt = "0.3.12"
 directories = "2.0.2"
