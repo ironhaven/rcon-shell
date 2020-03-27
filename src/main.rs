@@ -3,20 +3,21 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use std::error::Error;
 use std::fs;
+use std::io;
 use structopt::StructOpt;
 use tokio::runtime::Runtime;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "rcon-shell")]
 struct Opt {
-    /// Domain name or ip address of server to connect to
+    /// Domain name or ip address of server to connect to.
     #[structopt(short = "H", long)]
     host: String,
-    /// Port number of server connect to
+    /// Port number of server to connect to.
     #[structopt(short = "P", long, default_value = "25575")]
     port: u16,
-    /// RCON password to server. Can be given in prompt
-    /// The password input will be hidden in the prompt
+    /// RCON password to server. Can be given in the cli.
+    /// The password input will be hidden in the terminal.
     #[structopt(short, long)]
     password: Option<String>,
 }
@@ -28,9 +29,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         .unwrap()
         .cache_dir()
         .join("history.txt");
-    if let Err(_) = rl.load_history(&history_path) {
-        fs::create_dir_all(&history_path.parent().unwrap())?;
-        fs::File::create(&history_path)?;
+    if let Err(ReadlineError::Io(e)) = rl.load_history(&history_path) {
+        if let io::ErrorKind::NotFound = e.kind() {
+            fs::create_dir_all(&history_path.parent().unwrap())?;
+            fs::File::create(&history_path)?;
+        }
     }
     let opt = Opt::from_args();
     let mut rcon = rt.block_on(rcon::Connection::connect(
@@ -38,19 +41,19 @@ fn main() -> Result<(), Box<dyn Error>> {
         &opt.password
             .unwrap_or_else(|| rpassword::read_password_from_tty(Some("rcon password: ")).unwrap()),
     ))?;
-	println!("Enter 'Q' to quit");
+    println!("Enter 'Q' to quit");
     loop {
         let readline = rl.readline("> ");
         match readline {
-			Ok(quit) if quit == "Q" => {
-				break;
-			}
+            Ok(quit) if quit == "Q" => {
+                break;
+            }
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-				let resp = rt.block_on(rcon.cmd(&line))?;
-				if !resp.is_empty() {
-						println!("{}", resp);
-	}
+                let resp = rt.block_on(rcon.cmd(&line))?;
+                if !resp.is_empty() {
+                    println!("{}", resp);
+                }
             }
             Err(ReadlineError::Interrupted) => {
                 break;
