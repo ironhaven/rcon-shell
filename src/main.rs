@@ -1,3 +1,12 @@
+//! CLI to administer command to Source or Minecraft servers
+//! Copyright (C) 2020 Nicholas Farley
+//!
+//! This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+//!
+//! This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//!
+//! You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 use directories::ProjectDirs;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
@@ -8,7 +17,11 @@ use structopt::StructOpt;
 use tokio::runtime::Runtime;
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "rcon-shell")]
+#[structopt(
+    name = "rcon-shell",
+    about = "CLI to administer command to Source or Minecraft servers",
+    author = "Copyright (C) 2020 Nicholas Farley"
+)]
 struct Opt {
     /// Domain name or ip address of server to connect to.
     #[structopt(short = "H", long)]
@@ -21,6 +34,17 @@ struct Opt {
     #[structopt(short, long)]
     password: Option<String>,
 }
+
+const BANNER: &'static str = concat!(
+    "rcon-shell ",
+    env!("CARGO_PKG_VERSION"),
+    " Copyright (C) 2020 Nicholas Farley
+This program comes with ABSOLUTELY NO WARRANTY
+This is free software, and you are welcome to redistribute it under certain conditions
+for more info go to https://www.gnu.org/licenses/gpl-3.0.en.html
+
+Enter 'Q' to quit"
+);
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut rl = Editor::<()>::new();
@@ -41,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         &opt.password
             .unwrap_or_else(|| rpassword::read_password_from_tty(Some("rcon password: ")).unwrap()),
     ))?;
-    println!("Enter 'Q' to quit");
+    println!("{}", BANNER);
     loop {
         let readline = rl.readline("> ");
         match readline {
