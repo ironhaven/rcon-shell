@@ -4,6 +4,11 @@ version = "0.1.0"
 authors = ["Nick Farley <nick-1154@hotmail.com>"]
 edition = "2018"
 license = "GPL-3.0-or-later"
+description = "CLI to administer commands to Source or Minecraft servers"
+repository = "https://github.com/ironhaven/rcon-shell"
+keywords = ["remote-shell"]
+categories = ["command-line-utilities"]
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
