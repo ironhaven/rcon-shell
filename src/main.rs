@@ -74,7 +74,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                let resp = rt.block_on(rcon.cmd(&line))?;
+                let resp = match rt.block_on(rcon.cmd(&line)) {
+                    Ok(line) => line,
+                    Err(e) => {
+                        println!("backing up");
+                        rl.save_history(&history_path)?;
+                        return Err(Box::new(e));
+                    }
+                };
                 if !resp.is_empty() {
                     println!("{}", resp);
                 }
@@ -90,6 +97,6 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
-    rl.save_history(&history_path).unwrap();
+    rl.save_history(&history_path)?;
     Ok(())
 }
