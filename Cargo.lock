@@ -355,7 +355,9 @@ dependencies = [
 
 [[package]]
 name = "rcon"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52a41ba9356e7f37a432e2bc8fcf6f401400a50989e2c88609ed5608dcb0ff19"
 dependencies = [
  "err-derive",
  "tokio",
