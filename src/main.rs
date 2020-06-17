@@ -47,12 +47,15 @@ Enter 'Q' to quit"
 );
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut rl = Editor::<()>::new();
     let mut rt = Runtime::new()?;
     let history_path = ProjectDirs::from("net", "ironhaven", "rcon-shell")
         .unwrap()
         .cache_dir()
         .join("history.txt");
+
+    let mut rl = scopeguard::guard(Editor::<()>::new(), |rl| {
+        rl.save_history(&history_path).unwrap();
+    });
     if let Err(ReadlineError::Io(e)) = rl.load_history(&history_path) {
         if let io::ErrorKind::NotFound = e.kind() {
             fs::create_dir_all(&history_path.parent().unwrap())?;
@@ -78,7 +81,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                     Ok(line) => line,
                     Err(e) => {
                         println!("backing up");
-                        rl.save_history(&history_path)?;
                         return Err(Box::new(e));
                     }
                 };
@@ -97,6 +99,5 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
-    rl.save_history(&history_path)?;
     Ok(())
 }
