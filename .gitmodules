@@ -1,0 +1,3 @@
+[submodule "minecraft-formatting"]
+	path = minecraft-formatting
+	url = ./minecraft-formatting/
