@@ -155,13 +155,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "directories"
-version = "2.0.2"
+name = "directories-next"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "551a778172a450d7fc12e629ca3b0428d00f6afa9a43da1b630d54604e97371c"
+checksum = "21eaa04e945bec7e2dc7383817c566881d9a83d20a07cc949b54585873585a48"
 dependencies = [
  "cfg-if",
- "dirs-sys",
+ "dirs-sys-next",
 ]
 
 [[package]]
@@ -172,17 +172,6 @@ checksum = "1cbcf9241d9e8d106295bd496bbe2e9cffd5fa098f2a8c9e2bbcbf09773c11a8"
 dependencies = [
  "cfg-if",
  "dirs-sys-next",
-]
-
-[[package]]
-name = "dirs-sys"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e93d7f5705de3e49895a2b5e0b8855a1c27f080192ae9c32a6432d50741a57a"
-dependencies = [
- "libc",
- "redox_users",
- "winapi 0.3.8",
 ]
 
 [[package]]
@@ -343,6 +332,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "minecraft-formatting"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0afad51847b3b1ebe6f19a46e3db97a5b445b6ae87aeb3f56f01c99ba54f32f"
+dependencies = [
+ "bitflags",
+ "crossterm",
+]
+
+[[package]]
 name = "mio"
 version = "0.6.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -485,7 +484,8 @@ dependencies = [
 name = "rcon-shell"
 version = "0.1.1"
 dependencies = [
- "directories",
+ "directories-next",
+ "minecraft-formatting 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rcon",
  "rpassword",
  "rustyline",

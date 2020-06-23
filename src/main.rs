@@ -7,7 +7,7 @@
 //!
 //! You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use directories::ProjectDirs;
+use directories_next::ProjectDirs;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use std::error::Error;
@@ -70,22 +70,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     ))?;
     println!("{}", BANNER);
     loop {
-        let readline = rl.readline("> ");
-        match readline {
-            Ok(quit) if quit == "Q" => {
+        match rl.readline("> ") {
+            Ok(quit) if quit.trim() == "Q" => {
                 break;
             }
             Ok(line) => {
-                rl.add_history_entry(line.as_str());
-                let resp = match rt.block_on(rcon.cmd(&line)) {
-                    Ok(line) => line,
-                    Err(e) => {
-                        println!("backing up");
-                        return Err(Box::new(e));
-                    }
-                };
+                rl.add_history_entry(&line);
+                let resp = rt.block_on(rcon.cmd(&line))?;
+
                 if !resp.is_empty() {
-                    println!("{}", resp);
+                    minecraft_formatting::formatting_tokenize(&resp).iter().for_each(|span| span.print());
                 }
             }
             Err(ReadlineError::Interrupted) => {
