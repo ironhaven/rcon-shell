@@ -14,10 +14,8 @@ This crate provides an executable that provides a command line interface to some
 
 ## Bugs
 
-  - When sending commands to a Minecraft server you may get an "Unexpected EOF" or "Connection reset" error that crashes the program. Blame the crap rcon support.
-
-  - On windows use cmd.exe with this program because of shortcomings in the rustyline crate.
-
+  - When sending commands to a Minecraft server you may get an "Unexpected EOF" or "Connection reset" error that crashes the program. Blame the crap rcon impl.
+  
 ## Changelog
   - 0.1.1
     - Command line history is saved on crash.
